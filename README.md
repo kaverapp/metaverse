@@ -79,3 +79,14 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
 - [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
 - [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+
+
+
+prisma configuration
+
+<!-- npm i prisma
+npx prisma init
+create schema
+start the database locally ->  docker run -p 5432:5432 -e POSTGRES_password=mysecretpassword -d postgres
+replace the env databaseurl ->"postgresql://postgres:mysecretpassword@localhost:5432/postgres"
+-->
