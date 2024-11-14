@@ -1,6 +1,7 @@
 {
   "name": "http",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
@@ -11,8 +12,16 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@repo/db": "*",
     "@types/express": "^5.0.0",
-    "express": "^4.21.1",
-    "typescript": "^5.6.3"
+    "bcrypt": "^5.1.1",
+    "express": "^5.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "typescript": "^5.6.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.7"
   }
 }

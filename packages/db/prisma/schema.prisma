@@ -17,10 +17,10 @@ model User {
   id           String    @id @unique @default(cuid())
   username     String    @unique
   password     String    
-  avatarId     String
+  avatarId     String?
   role         Role
-  space        Space[]                           //connecting the foriegn key   [   User (1) ----> (Many) Space ]
-  avatar       Avatar    @relation(fields: [avatarId],references: [id])
+  spaces       Space[]                           //connecting the foriegn key   [   User (1) ----> (Many) Space ]
+  avatar       Avatar?    @relation(fields: [avatarId],references: [id])
 }
 
 model Space {
@@ -80,7 +80,7 @@ model Avatar {
 }
 
 enum Role{
-  ADMIN
-  USER
+     USER
+     ADMIN
 
 }
