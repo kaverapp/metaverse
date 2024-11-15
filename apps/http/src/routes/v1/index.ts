@@ -8,43 +8,50 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config.js";
 import { Request, Response } from 'express';
-// import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 
 export const router=Router();
 const client = new PrismaClient();
 
-// console.log(client);  // Check if `user` is available on client
 
-router.post("/signup", async(req, res) => {
+//Test Passwd Successfully
+router.post("/signup", async (req, res) => {
     console.log("inside signup")
+    console.log("Request received at:", new Date());
+
     // check the user
     const parsedData = SignupSchema.safeParse(req.body)
     if (!parsedData.success) {
-        console.log("parsed data incorrect",parsedData)
-        res.status(400).json({message: "Validation failed"})
+        console.log("parsed data incorrect")
+        res.status(400).json({message: "Validation failed", error: parsedData.error})
         return
     }
 
     const hashedPassword = await bcrypt.hash(parsedData.data.password,10)
 
     try {
+        const existingUser = await client.user.findUnique({
+            where: { username: parsedData.data.username },
+        })
+        if(existingUser) {
+            console.log("user already exists")
+            res.status(400).json({message: "User already exists"})
+            return
+        }
          const user = await client.user.create({
             data: {
                 username: parsedData.data.username,
                 password: hashedPassword,
-                role: parsedData.data.type == "ADMIN" ? "ADMIN" : "USER",
+                role: parsedData.data.type === "ADMIN" ? "ADMIN" : "USER",
             }
         })
-        console.log(user);
-        
         res.json({
             userId: user.id
         })
-    } catch(e ) {
-        
-        console.log(e);
-        res.status(500).json({ message: "Internal server error" });
+    } catch(e) {
+        console.log("erroer thrown")
+        console.log(e)
+        res.status(400).json({message: "User already exists"})
     }
 })
 
@@ -53,9 +60,9 @@ router.post("/signin", async (req: Request, res: Response) => {
     
     const parsedData = SigninSchema.safeParse(req.body);
     if (!parsedData.success) {
-        console.log("sign in failed",parsedData);
+        console.log("Signin schema validation failed", parsedData);
         
-        res.status(403).json({ message: "signin failed" });
+        res.status(403).json({ message: "signin failed", error: parsedData.error });
         return;
     }
     try {
@@ -64,7 +71,7 @@ router.post("/signin", async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            console.log("user not found");
+            console.log("User authentication failed");
             
             res.status(403).json({ message: "user not found" });
             return;
@@ -79,26 +86,23 @@ router.post("/signin", async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
-        if (!token) {
-            console.log("token not generated");
-        
-            res.status(400).json({ message: "token not generated" });
-            return;
-        }
+       
 
         res.status(200)
             .cookie("token", token, {
-                httpOnly: true,
+                // httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
             })
             .json({ msg: "signin success", token });
+            console.log("signin success");
+            
     } catch (error) {
-        console.error(error); // Log the error for debugging
+        console.error("Internal server error:", error);
         res.status(500).json({ message: "some internal issue occurred" });
     }
 });
-
+//end
 
 
 
