@@ -13,8 +13,11 @@ export const SigninSchema=z.object({
 })
 //end
 
+//starting......11/21/2024
 export const updateMetadataSchema=z.object({
     avatarId:z.string(),
+    metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])), // Example: string, number, or boolean values
+
 })
 
 export const CreateSpaceSchema=z.object({
