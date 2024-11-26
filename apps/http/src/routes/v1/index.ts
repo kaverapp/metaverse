@@ -1,3 +1,4 @@
+
 import  { Router } from "express";
 import { userRouter } from "./user.js";
 import { adminRouter } from "./admin.js";
@@ -92,7 +93,7 @@ router.post("/signin", async (req: Request, res: Response) => {
             .cookie("token", token, {
                 // httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
+                sameSite: "lax",
             })
             .json({ msg: "signin success", token });
             console.log("signin success");
