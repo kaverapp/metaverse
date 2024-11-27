@@ -15,7 +15,7 @@ export const SigninSchema=z.object({
 
 //starting......11/21/2024
 export const updateMetadataSchema=z.object({
-    avatarId:z.string(),
+    avatarId:z.string().nullable(),
     metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])), // Example: string, number, or boolean values
 
 })
@@ -24,7 +24,7 @@ export const CreateSpaceSchema=z.object({
     name:z.string(),
     //custom function that validates 100X100 schema
     dimensions:z.string().regex(/^[0-9]{1,5}x[0-9]{1,5}$/),
-    mapId:z.string(),
+    mapId:z.string().optional(),
 })
 
 export const addElementSchema=z.object({

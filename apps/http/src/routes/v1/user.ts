@@ -12,7 +12,7 @@ userRouter.post("/metadata",userMiddleware,async(req:Request,res:Response):Promi
     console.log("inside metadata.........................." );
     
     const parsedData=updateMetadataSchema.safeParse(req.body);
-    console.log(parsedData);
+    console.log("after",req.body);
     
     if(!parsedData.success){
         console.error("Validation Error:", parsedData.error);
