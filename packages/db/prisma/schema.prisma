@@ -19,7 +19,7 @@ model User {
   password     String    
   avatarId     String?
   role         Role
-  metadata Json?   // Add this field for metadata
+  metadata     Json?   // Add this field for metadata
 
   spaces       Space[]                           //connecting the foriegn key   [   User (1) ----> (Many) Space ]
   avatar       Avatar?    @relation(fields: [avatarId],references: [id])
