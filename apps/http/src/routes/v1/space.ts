@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CreateSpaceSchema } from "../../types/index.js";
+import { CreateSpaceSchema,CreateElementSchema } from "../../types/index.js";
 import { PrismaClient } from "@prisma/client";
 import { userMiddleware } from "../../middleware/user.js";
 
@@ -147,15 +147,76 @@ spaceRouter.delete("/:spaceId", userMiddleware,async(req, res) => {
             creatorId:true
         }
     })
+    if (!space){
+        res.status(400).json({message: "Space not found"})
+        return
+    }
+    if(space.creatorId !== req.userId){
+        console.log(" inside space :id");
+        
+        res.status(403).json({message: "Unauthorized"})
+        return
+    }
 
-    if(space?.creatorId !== req.userId){}
+    await client.space.delete({
+        where: {
+            id: req.params.spaceId
+        }
+    })
+    res.json({message: "Space deleted"})
 
  })
 
-spaceRouter.get("/all", (req, res) => { })
 
 
-spaceRouter.post("/element", (req, res) => { })
+spaceRouter.get("/all", userMiddleware,async(req, res) => { 
+    const spaces=await client.space.findMany({
+        where:{
+            creatorId: req.userId
+        }
+    });
+
+    res.json({
+        spaces:spaces.map(s=>({
+            id: s.id,
+            name: s.name,
+            thumbnail: s.thumbnail,
+            dimensions: `${s.width}x${s.height}`
+        })
+    )})
+})
+
+
+spaceRouter.post("/element",userMiddleware,async (req, res) => {
+    const parsedData = CreateElementSchema.safeParse(req.body)
+    if(!parsedData.success){
+        res.status(400).json({message: "Invalid data"})
+        return
+    }
+    const space=await client.space.findUnique({
+        where: {
+            id: req.body.spaceId,
+            creatorId: req.userId
+        },
+        select: {
+            width: true,
+            height: true
+        }
+    })
+    if(!space){
+        res.status(400).json({message: "Space not found"})
+        return
+    }
+    
+    const element=await client.element.create({
+        data: {
+            imageUrl: parsedData.data.imageUrl,
+            width:parsedData.data.width,
+            height:parsedData.data.height,
+            static: parsedData.data.static,
+        }
+ })
+})
 
 spaceRouter.delete("/element", (req, res) => { })
 

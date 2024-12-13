@@ -20,7 +20,7 @@ router.post("/signup", async (req, res) => {
     console.log("inside signup")
     console.log("Request received at:", new Date());
 
-    // check the user
+              // Validate input
     const parsedData = SignupSchema.safeParse(req.body)
     if (!parsedData.success) {
         console.log("parsed data incorrect")
@@ -28,9 +28,10 @@ router.post("/signup", async (req, res) => {
         return
     }
 
-    const hashedPassword = await bcrypt.hash(parsedData.data.password,10)
 
     try {
+                // Check if the user already exists
+
         const existingUser = await client.user.findUnique({
             where: { username: parsedData.data.username },
         })
@@ -39,6 +40,11 @@ router.post("/signup", async (req, res) => {
             res.status(400).json({message: "User already exists"})
             return
         }
+
+                // Create new user
+
+        const hashedPassword = await bcrypt.hash(parsedData.data.password, 10);
+
          const user = await client.user.create({
             data: {
                 username: parsedData.data.username,
@@ -46,6 +52,9 @@ router.post("/signup", async (req, res) => {
                 role: parsedData.data.type === "ADMIN" ? "ADMIN" : "USER",
             }
         })
+
+                // Respond with the newly created user's ID
+
         res.json({
             userId: user.id
         })
